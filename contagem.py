@@ -7,6 +7,7 @@ import csv
 import os
 
 
+
 # Arquivo csv contendo as informações de cada partícula (4 leptons)
 pasta_csv = r"C:\Users\venut\Desktop\CSV"
 # Lista para armazenar os caminhos completos de todos os arquivos CSV na pasta
@@ -172,6 +173,10 @@ bins = 25
 largura=2
 plt.hist(zz_resultados, bins, range=(0, 150), histtype='step', color="blue", label='calculo',linewidth=largura)
 plt.hist(Referencia, bins, range=(0, 150), histtype='step', color="green", label='referência',linewidth=largura)
+fontsize=20
+plt.xlabel(r'$M_{ℓ⁺ℓ⁻}$ [$GeV/c^2$]',fontsize=fontsize)
+plt.ylabel(r'Eventos',fontsize=fontsize)
+plt.title('Distribuição da massa do bóson Z',fontsize=fontsize)
 plt.legend()
 
 
@@ -186,8 +191,10 @@ plt.hist(part1, bins, range=(0, 150), histtype='step', color="blue", label='part
 plt.hist(part2, bins, range=(0, 150), histtype='step', color="green", label='partícula 2',linewidth=largura)
 plt.hist(part3, bins, range=(0, 150), histtype='step', color="purple", label='partícula 3',linewidth=largura)
 plt.hist(part4, bins, range=(0, 150), histtype='step', color="red", label='partícula 4',linewidth=largura)
+fontsize=20
+plt.xlabel(r'Distribuição de $P_T$ [GeV]',fontsize=fontsize)
+plt.ylabel(r'Eventos',fontsize=fontsize)
+plt.title('Distribuição do Pt',fontsize=fontsize)
 plt.legend()
-
-
 
 plt.show()
