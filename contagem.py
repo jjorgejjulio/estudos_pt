@@ -118,10 +118,11 @@ candidato6 = [item for result in df.apply(zz_candidato6, axis=1) for item in res
 candidato5= [valor for valor in candidato5 if 12 < valor < 103]
 candidato6= [valor for valor in candidato6 if 12 < valor < 103]
 
+#Essa maneira que as funções foram determinadas estão erradas, seria possível realizar apenas uma única função.
 
 #Dessa forma que foi realizada a separação das possíveis combinações das partículas com o mesmo sabor, não é possível determinar qual é a correta.
 
-# Agora, as combinações das partículas com mesmo sabor serão escolhidas utilizando o Pt
+# Agora, as combinações das partículas com mesmo sabor serão escolhidas utilizando o Pt.
 
 #==================================================================================================================
 
