@@ -7,7 +7,6 @@ import csv
 import os
 
 
-
 # Arquivo csv contendo as informações de cada partícula (4 leptons)
 pasta_csv = r"C:\Users\venut\Desktop\CSV"
 # Lista para armazenar os caminhos completos de todos os arquivos CSV na pasta
@@ -18,13 +17,10 @@ for arquivo in os.listdir(pasta_csv):
 # junta os arquivos em 1 só
 df = pd.concat((pd.read_csv(file_path) for file_path in arquivos_csv), axis=0)
 
-
+#referência
 x1data=np.array(df['mZ1'])
 x2data=np.array(df['mZ2'])
-x3data= np.hstack((x1data, x2data))
-
-zz_resultados = []
-
+Referencia= np.hstack((x1data, x2data))
 
 def zz_sabor_oposto (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
@@ -37,7 +33,6 @@ def zz_sabor_oposto (row):
     else:
         return None, None
 
-
 def zz_candidato1 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
     v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
@@ -48,7 +43,6 @@ def zz_candidato1 (row):
             return (v1+v3).mass , (v2+v4).mass
     else:
         return None , None
-
 
 def zz_candidato2 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
@@ -61,7 +55,6 @@ def zz_candidato2 (row):
     else:
         return None , None
 
-
 def zz_candidato3 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
     v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
@@ -71,8 +64,7 @@ def zz_candidato3 (row):
     if row['Q1'] != row['Q2'] and row['Q3'] != row['Q4'] and  row['Q1'] == row['Q3'] and abs(row['PID1']) == abs(row['PID2']) and abs(row['PID1']) == abs(row['PID3']) :
             return (v1+v2).mass , (v3+v4).mass
     else:
-        return None , None
-    
+        return None , None   
 
 def zz_candidato4 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
@@ -85,7 +77,6 @@ def zz_candidato4 (row):
     else:
         return None , None
 
-
 def zz_candidato5 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
     v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
@@ -96,7 +87,6 @@ def zz_candidato5 (row):
             return (v1+v2).mass , (v3+v4).mass
     else:
         return None , None
-
 
 def zz_candidato6 (row):
     v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
@@ -128,31 +118,76 @@ candidato5= [valor for valor in candidato5 if 12 < valor < 103]
 candidato6= [valor for valor in candidato6 if 12 < valor < 103]
 
 
-resultados1 = [item for result in df.apply(zz_sabor_oposto, axis=1) for item in result if item is not None]
-zz_resultados.extend(resultados1)
+#Dessa forma que foi realizada a separação das possíveis combinações das partículas com o mesmo sabor, não é possível determinar qual é a correta.
+
+# Agora, as combinações das partículas com mesmo sabor serão escolhidas utilizando o Pt
+
+#==================================================================================================================
+
+#calculo da massa zz
+def massa_zz (row):
+    v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
+    v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
+    v3 = vector.obj(px=row['px3'], py=row['py3'], pz=row['pz3'], E=row['E3'])
+    v4 = vector.obj(px=row['px4'], py=row['py4'], pz=row['pz4'], E=row['E4'])
+    vetores_com_pt = [(v1.pt, v1), (v2.pt, v2), (v3.pt, v3), (v4.pt, v4)]
+    vetores_ordenados = sorted(vetores_com_pt, key=lambda x: x[0], reverse=True)
+    candidato = [vetor for _, vetor in vetores_ordenados]
+
+    if row['PID1'] == - row['PID2'] and row['PID3'] == -row['PID4'] and abs(row['PID1']) != abs(row['PID3']):
+        return (v1+v2).mass , (v3+v4).mass
+    
+    if row['Q1'] == row['Q2'] and row['Q1'] != row['Q3'] and abs(row['PID1']) == abs(row['PID2']) and abs(row['PID1']) == abs(row['PID3']):
+        return (candidato[0]+candidato[1]).mass , (candidato[2]+candidato[3]).mass
+
+    if row['Q1'] != row['Q2'] and row['Q3'] != row['Q4'] and  row['Q1'] == row['Q3'] and abs(row['PID1']) == abs(row['PID2']) and abs(row['PID1']) == abs(row['PID3']):
+        return (candidato[0]+candidato[1]).mass , (candidato[2]+candidato[3]).mass
+    
+    if row['Q1'] != row['Q2'] and row['Q3'] != row['Q4'] and  row['Q1'] == row['Q4'] and abs(row['PID1']) == abs(row['PID2']) and abs(row['PID1']) == abs(row['PID3']):
+         return (candidato[0]+candidato[1]).mass , (candidato[2]+candidato[3]).mass
+    else:
+         return None, None
+
+
+#Distribuição do pt
+def distribuiçao_pt(row):
+    v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
+    v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
+    v3 = vector.obj(px=row['px3'], py=row['py3'], pz=row['pz3'], E=row['E3'])
+    v4 = vector.obj(px=row['px4'], py=row['py4'], pz=row['pz4'], E=row['E4'])  
+    vetores_com_pt = [(v1.pt, v1), (v2.pt, v2), (v3.pt, v3), (v4.pt, v4)]
+    vetores_ordenados = sorted(vetores_com_pt, key=lambda x: x[0], reverse=True)
+    pt_partículas_ordenadas = [pt for pt, _ in vetores_ordenados]
+    return pt_partículas_ordenadas
+
+
+
+
+#plot das massas
+zz_resultados = [item for result in df.apply(massa_zz, axis=1) for item in result if item is not None]
 print(len(zz_resultados))
 
-
-
-
-
-bins = 21
+plt.figure()
+bins = 25
 largura=2
-plt.figure()
-#plt.hist(zz_resultados, bins,  histtype='step', color="blue", label='Calculado',linewidth=largura)
-#plt.hist(x3data, bins,  histtype='step', color="green", label='Referência',linewidth=largura)
-plt.hist(candidato1, bins,  histtype='step', color="red", label='cand1',linewidth=largura)
-plt.hist(candidato2, bins,  histtype='step', color="blue", label='cand2',linewidth=largura)
-plt.legend(fontsize=14)
+plt.hist(zz_resultados, bins, range=(0, 150), histtype='step', color="blue", label='calculo',linewidth=largura)
+plt.hist(Referencia, bins, range=(0, 150), histtype='step', color="green", label='referência',linewidth=largura)
+plt.legend()
+
+
+#plot do pt
+pt_distribuido = df.apply(distribuiçao_pt, axis=1)
+part1, part2, part3, part4 = zip(*pt_distribuido)
 
 plt.figure()
-plt.hist(candidato3, bins,  histtype='step', color="red", label='cand1',linewidth=largura)
-plt.hist(candidato4, bins,  histtype='step', color="blue", label='cand2',linewidth=largura)
-plt.legend(fontsize=14)
+bins = 25
+largura=2
+plt.hist(part1, bins, range=(0, 150), histtype='step', color="blue", label='partícula 1',linewidth=largura)
+plt.hist(part2, bins, range=(0, 150), histtype='step', color="green", label='partícula 2',linewidth=largura)
+plt.hist(part3, bins, range=(0, 150), histtype='step', color="purple", label='partícula 3',linewidth=largura)
+plt.hist(part4, bins, range=(0, 150), histtype='step', color="red", label='partícula 4',linewidth=largura)
+plt.legend()
 
-plt.figure()
-plt.hist(candidato5, bins,  histtype='step', color="red", label='cand1',linewidth=largura)
-plt.hist(candidato6, bins,  histtype='step', color="blue", label='cand2',linewidth=largura)
 
-plt.legend(fontsize=14)
+
 plt.show()
