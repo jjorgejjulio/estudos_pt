@@ -198,4 +198,32 @@ plt.ylabel(r'Eventos',fontsize=fontsize)
 plt.title('Distribuição do Pt',fontsize=fontsize)
 plt.legend()
 
+#==================================================================================================================
+#Fazendo o plot da massa do Higgs
+def massa_H(row):
+    v1 = vector.obj(px=row['px1'], py=row['py1'], pz=row['pz1'], E=row['E1'])
+    v2 = vector.obj(px=row['px2'], py=row['py2'], pz=row['pz2'], E=row['E2'])
+    v3 = vector.obj(px=row['px3'], py=row['py3'], pz=row['pz3'], E=row['E3'])
+    v4 = vector.obj(px=row['px4'], py=row['py4'], pz=row['pz4'], E=row['E4'])
+    return (v1 + v2 + v3 + v4).mass
+
+# Aplicando a função à coluna e criando uma nova coluna no DataFrame
+df['massa_H'] = df.apply(massa_H, axis=1)
+
+#referência do Higgs
+
+ref_higgs=np.array(df['M'])
+
+# Plotando o histograma
+plt.figure()
+bins = 25
+largura = 2
+plt.hist(df['massa_H'], bins, range=(0, 150), histtype='step', color="blue", label='calculo', linewidth=largura)
+plt.hist(ref_higgs, bins, range=(0, 150), histtype='step', color="red", label='referência', linewidth=largura)
+fontsize = 20
+plt.xlabel(r'$M_{ℓ⁺ℓ⁻}$ [$GeV/c^2$]', fontsize=fontsize)
+plt.ylabel(r'Eventos', fontsize=fontsize)
+plt.title('Distribuição da massa do Higgs', fontsize=fontsize)
+plt.legend()
+
 plt.show()
